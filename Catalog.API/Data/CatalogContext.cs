@@ -11,7 +11,7 @@ public class CatalogContext : ICatalogContext
             ("DatabaseSettings:ConnectionString"));
 
         var database = client.GetDatabase(configuration.GetValue<string>
-            ("DatabaseSettings: DatabaseName"));
+            ("DatabaseSettings:DatabaseName"));
 
         Products = database.GetCollection<Product>(configuration.GetValue<string>
             ("DatabaseSettings:CollectionName"));
