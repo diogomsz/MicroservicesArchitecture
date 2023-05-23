@@ -37,7 +37,7 @@ public class BasketRepository : IBasketRepository
             return null;
         }
 
-        return JsonSerializer.Deserialize<ShoppingCart?>(basket);
+        return JsonSerializer.Deserialize<ShoppingCart>(basket);
     }
 
     /// <summary>
