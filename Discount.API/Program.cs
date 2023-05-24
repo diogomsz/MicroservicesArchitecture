@@ -10,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add Repository Scoped
+// Add Repository Service Dependency Injection
 builder.Services.AddScoped<IDiscountRepository, DiscountRepository>();
 
 var app = builder.Build();
