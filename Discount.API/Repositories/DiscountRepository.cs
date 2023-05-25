@@ -29,9 +29,8 @@ public class DiscountRepository : IDiscountRepository
     /// </returns>
     private NpgsqlConnection GetConnectionPostgreSQL()
     {
-        using var connection = new NpgsqlConnection(_configuration
-            .GetValue<string>("DatabaseSettings:ConnectionString"));
-        return connection;
+        string? connectionString = _configuration.GetValue<string>("DatabaseSettings:ConnectionString");
+        return new NpgsqlConnection(connectionString);
     }
 
     /// <summary>
@@ -76,14 +75,15 @@ public class DiscountRepository : IDiscountRepository
     public async Task<bool> CreateDiscount(Coupon coupon)
     {
         NpgsqlConnection connection = GetConnectionPostgreSQL();
-        var affected = await connection.ExecuteAsync
-            ("INSERT INTO Coupon (ProductName, Description, Amount) VALUES " +
-            "(@ProductName, @Description, @Amount)", new
-            {
-                ProductName = coupon.ProductName,
-                Description = coupon.Description,
-                Amount = coupon.Amount,
-            });
+        string command = "INSERT INTO Coupon (ProductName, Description, Amount) VALUES (@ProductName, @Description, @Amount)";
+        var queryArgs = new
+        {
+            ProductName = coupon.ProductName,
+            Description = coupon.Description,
+            Amount = coupon.Amount,
+        };
+
+        var affected = await connection.ExecuteAsync(command, queryArgs);
         if (affected == 0)
         {
             return false;
@@ -105,16 +105,16 @@ public class DiscountRepository : IDiscountRepository
     {
         NpgsqlConnection connection = GetConnectionPostgreSQL();
 
-        var affected = await connection.ExecuteAsync
-            ("UPDATE Coupon SET " +
-            "(ProductName = @ProductName, Description = @Description, Amount = @Amount) " +
-            "WHERE Id = @Id ", new
-            {
-                ProductName = coupon.ProductName,
-                Description = coupon.Description,
-                Amount = coupon.Amount,
-                Id = coupon.Id,
-            });
+        string command = "UPDATE Coupon SET ProductName = @ProductName, Description = @Description, Amount = @Amount WHERE Id = @Id";
+        var queryArgs = new
+        {
+            ProductName = coupon.ProductName,
+            Description = coupon.Description,
+            Amount = coupon.Amount,
+            Id = coupon.Id,
+        };
+        var affected = await connection.ExecuteAsync(command, queryArgs);
+
         if (affected == 0)
         {
             return false;
@@ -136,11 +136,11 @@ public class DiscountRepository : IDiscountRepository
     {
         NpgsqlConnection connection = GetConnectionPostgreSQL();
 
-        var affected = await connection.ExecuteAsync
-            ("DELETR FROM Coupon WHERE ProductName = @ProductName", new
-            {
-                ProductName = productName
-            });
+        string command = "DELETE FROM Coupon WHERE ProductName = @ProductName";
+        var queryArgs = new { ProductName = productName };
+
+        var affected = await connection.ExecuteAsync(command, queryArgs);
+
         if (affected == 0)
         {
             return false;
