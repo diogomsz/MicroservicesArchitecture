@@ -3,7 +3,6 @@ using Discount.gRPC.Entities;
 using Discount.gRPC.Protos;
 using Discount.gRPC.Repository.Interfaces;
 using Grpc.Core;
-using System.Linq.Expressions;
 
 namespace Discount.gRPC.Services;
 
@@ -14,8 +13,8 @@ public class DiscountService : DiscountProtoService.DiscountProtoServiceBase
     private readonly ILogger<DiscountService> _logger;
 
     public DiscountService(
-        IDiscountRepository discountRepository, 
-        IMapper mapper, 
+        IDiscountRepository discountRepository,
+        IMapper mapper,
         ILogger<DiscountService> logger)
     {
         _discountRepository = discountRepository;
@@ -26,9 +25,9 @@ public class DiscountService : DiscountProtoService.DiscountProtoServiceBase
     public override async Task<CouponModel> GetDiscount(
         GetDiscountRequest request, ServerCallContext context)
     {
-        var coupon = await _discountRepository.GetDiscount(request.ProductName) ?? 
+        var coupon = await _discountRepository.GetDiscount(request.ProductName) ??
             throw new RpcException(new Status(
-                StatusCode.NotFound, 
+                StatusCode.NotFound,
                 $"Discount with ProductName = {request.ProductName} not found"));
 
         _logger.LogInformation("Discount retrieved for ProductName: {productName}, " +
