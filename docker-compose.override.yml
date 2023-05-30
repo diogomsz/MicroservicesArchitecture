@@ -1,7 +1,6 @@
 version: '3.4'
 
 services:
-# MongoDB Container
   catalogdb:
     container_name: catalogdb
     restart: always
@@ -9,13 +8,13 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-# Redis Container
+
   basketdb:
     container_name: basketdb
     restart: always
     ports:
       - "6379:6379"
-# Postgres Container
+
   discountdb:
     container_name: discountdb
     environment:
@@ -27,7 +26,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-# PGAdmin Container
+
   pgadmin:
     container_name: pgadmin
     environment:
@@ -38,7 +37,7 @@ services:
       - "5050:80"
     volumes:
       - pgadmin_data:/root/.pgadmin 
-# Catalog.API Container
+
   catalog.api:
     container_name: catalog.api
     environment:
@@ -48,17 +47,18 @@ services:
       - catalogdb
     ports:
       - "8000:80"
-# Basket.API Container
+
   basket.api:
     container_name: basket.api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "CacheSettings__ConnectionString=basketdb:6379"
+      - "GrpcSettings__DiscountUrl=discount.grpc"
     depends_on:
       - basketdb
     ports:
       - "8001:80"
-# Discount.API Container
+
   discount.api:
     container_name: discount.api
     environment:
@@ -69,3 +69,12 @@ services:
     ports:
       - "8002:80"
 
+  discount.grpc:
+    container_name: discount.grpc
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "DatabaseSettings__ConnectionString=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234"
+    depends_on:
+      - discountdb
+    ports:
+      - "8003:80"
